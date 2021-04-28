@@ -12,7 +12,9 @@ public class GLException extends Exception {
 	public GLException(int glError, GLException suppressed) {
 		super(new GLU().gluErrorString(glError));
 		this.glError = glError;
-		this.addSuppressed(suppressed);
+		if (suppressed != null) {
+			this.addSuppressed(suppressed);
+		}
 	}
 	
 	public GLException(String message) {
