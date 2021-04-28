@@ -506,6 +506,26 @@ public class Shader {
 	}
 
 	/**
+	 * Set the value of a uniform to a boolean
+	 * 
+	 * @param uniformName The GLSL uniform
+	 * @param value       The int value
+	 */
+	public void setUniform(String uniformName, boolean value) {
+		GL4 gl = (GL4) GLContext.getCurrentGL();
+		int uniform = getUniform(uniformName);
+		int type = uniformTypes.get(uniformName);
+
+		switch (type) {
+		case GL_BOOL:
+			gl.glUniform1ui(uniform, value ? 1 : 0);
+			break;
+		default:
+			throw new IllegalArgumentException(String.format("Expected %s got boolean", typeName(type)));			
+		}	
+	}
+
+	/**
 	 * Set the value of a uniform to an int
 	 * 
 	 * @param uniformName The GLSL uniform
@@ -526,8 +546,7 @@ public class Shader {
 			break;			
 		default:
 			throw new IllegalArgumentException(String.format("Expected %s got int", typeName(type)));			
-		}
-	
+		}	
 	}
 
 	/**
