@@ -208,7 +208,7 @@ public class Shader {
 				logString = new String(log);
 			}
 
-			String message = String.format("Link failed:\n", logString);
+			String message = String.format("Link failed: %s\n", logString);
 			throw new GLException(message);
 		}
 
