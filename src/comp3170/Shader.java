@@ -435,7 +435,7 @@ public class Shader {
 		int[] renderTexture = new int[1];
 		gl.glGenTextures(1, renderTexture, 0);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, renderTexture[0]);
-		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGB, width, height, 0, GL.GL_RGB, GL.GL_UNSIGNED_BYTE, null);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
 		
@@ -565,6 +565,59 @@ public class Shader {
 		}
 
 		gl.glUniform1f(uniform, value);
+	}
+
+	/**
+	 * Set the value of a uniform to an array of int
+	 * 
+	 * This works for GLSL types float, vec2, vec3, vec4, mat2, mat3 and mat4.
+	 * 
+	 * Note that for matrix types, the elements should be specified in column order
+	 * 
+	 * @param uniformName
+	 * @param value
+	 */
+	public void setUniform(String uniformName, int[] value) {
+		GL4 gl = (GL4) GLContext.getCurrentGL();
+		int uniform = getUniform(uniformName);
+		int type = uniformTypes.get(uniformName);
+
+		int expectedArgs = typeSize(type);
+
+		if (value.length != expectedArgs) {
+			throw new IllegalArgumentException(
+					String.format("Expected %s got int[%d]", typeName(type), value.length));
+		}
+
+		switch (type) {
+		case GL_INT:
+			gl.glUniform1i(uniform, value[0]);
+			break;
+		case GL_INT_VEC2:
+			gl.glUniform2i(uniform, value[0], value[1]);
+			break;
+		case GL_INT_VEC3:
+			gl.glUniform3i(uniform, value[0], value[1], value[2]);
+			break;
+		case GL_INT_VEC4:
+			gl.glUniform4i(uniform, value[0], value[1], value[2], value[4]);
+			break;
+		case GL_UNSIGNED_INT:
+			gl.glUniform1ui(uniform, value[0]);
+			break;
+		case GL_UNSIGNED_INT_VEC2:
+			gl.glUniform2ui(uniform, value[0], value[1]);
+			break;
+		case GL_UNSIGNED_INT_VEC3:
+			gl.glUniform3ui(uniform, value[0], value[1], value[2]);
+			break;
+		case GL_UNSIGNED_INT_VEC4:
+			gl.glUniform4ui(uniform, value[0], value[1], value[2], value[4]);
+			break;
+		default:
+			throw new IllegalArgumentException(
+					String.format("Cannot convert int array to %s", typeName(type)));
+		}
 	}
 
 	/**
@@ -754,6 +807,22 @@ public class Shader {
 			return 9;
 		case GL_FLOAT_MAT4:
 			return 16;
+		case GL_INT:
+			return 1;
+		case GL_INT_VEC2:
+			return 2;
+		case GL_INT_VEC3:
+			return 3;
+		case GL_INT_VEC4:
+			return 4;
+		case GL_UNSIGNED_INT:
+			return 1;
+		case GL_UNSIGNED_INT_VEC2:
+			return 2;
+		case GL_UNSIGNED_INT_VEC3:
+			return 3;
+		case GL_UNSIGNED_INT_VEC4:
+			return 4;
 		default:
 			throw new UnsupportedOperationException(
 					String.format("Unsupported GLSL attribute type: %s", typeName(type)));
@@ -764,7 +833,15 @@ public class Shader {
 	private int elementType(int type) {
 		switch (type) {
 		case GL_INT:
+		case GL_INT_VEC2:
+		case GL_INT_VEC3:
+		case GL_INT_VEC4:
 			return GL_INT;
+		case GL_UNSIGNED_INT:
+		case GL_UNSIGNED_INT_VEC2:
+		case GL_UNSIGNED_INT_VEC3:
+		case GL_UNSIGNED_INT_VEC4:
+			return GL_UNSIGNED_INT;
 		case GL_FLOAT:
 		case GL_FLOAT_VEC2:
 		case GL_FLOAT_VEC3:
