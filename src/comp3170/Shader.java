@@ -1,23 +1,21 @@
 package comp3170;
 
 /**
- * Version 2021.1 - decided I should keep track of version history
+ * Version 2022.1
  * 
+ * 2022.1: Factored into Shader, GLBuffers, and GLTypes to allow shaders to share buffers
+ * 
+ * @author Malcolm Ryan
  */
 
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
-import static com.jogamp.opengl.GL.GL_ELEMENT_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_FLOAT;
-import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
 import static com.jogamp.opengl.GL.GL_UNSIGNED_INT;
 import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_ATTRIBUTES;
 import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_ATTRIBUTE_MAX_LENGTH;
 import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_UNIFORMS;
 import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_UNIFORM_MAX_LENGTH;
 import static com.jogamp.opengl.GL2ES2.GL_BOOL;
-import static com.jogamp.opengl.GL2ES2.GL_BOOL_VEC2;
-import static com.jogamp.opengl.GL2ES2.GL_BOOL_VEC3;
-import static com.jogamp.opengl.GL2ES2.GL_BOOL_VEC4;
 import static com.jogamp.opengl.GL2ES2.GL_COMPILE_STATUS;
 import static com.jogamp.opengl.GL2ES2.GL_FLOAT_MAT2;
 import static com.jogamp.opengl.GL2ES2.GL_FLOAT_MAT3;
@@ -28,107 +26,21 @@ import static com.jogamp.opengl.GL2ES2.GL_FLOAT_VEC4;
 import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
 import static com.jogamp.opengl.GL2ES2.GL_INFO_LOG_LENGTH;
 import static com.jogamp.opengl.GL2ES2.GL_INT;
-import static com.jogamp.opengl.GL2ES2.GL_INT_SAMPLER_2D_MULTISAMPLE;
-import static com.jogamp.opengl.GL2ES2.GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY;
 import static com.jogamp.opengl.GL2ES2.GL_INT_VEC2;
 import static com.jogamp.opengl.GL2ES2.GL_INT_VEC3;
 import static com.jogamp.opengl.GL2ES2.GL_INT_VEC4;
 import static com.jogamp.opengl.GL2ES2.GL_LINK_STATUS;
 import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_2D;
-import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_2D_MULTISAMPLE;
-import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_2D_MULTISAMPLE_ARRAY;
-import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_2D_SHADOW;
-import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_3D;
-import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_CUBE;
-import static com.jogamp.opengl.GL2ES2.GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE;
-import static com.jogamp.opengl.GL2ES2.GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY;
 import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
-import static com.jogamp.opengl.GL2ES3.GL_FLOAT_MAT2x3;
-import static com.jogamp.opengl.GL2ES3.GL_FLOAT_MAT2x4;
-import static com.jogamp.opengl.GL2ES3.GL_FLOAT_MAT3x2;
-import static com.jogamp.opengl.GL2ES3.GL_FLOAT_MAT3x4;
-import static com.jogamp.opengl.GL2ES3.GL_FLOAT_MAT4x2;
-import static com.jogamp.opengl.GL2ES3.GL_FLOAT_MAT4x3;
-import static com.jogamp.opengl.GL2ES3.GL_IMAGE_2D;
-import static com.jogamp.opengl.GL2ES3.GL_IMAGE_2D_ARRAY;
-import static com.jogamp.opengl.GL2ES3.GL_IMAGE_3D;
-import static com.jogamp.opengl.GL2ES3.GL_IMAGE_BUFFER;
-import static com.jogamp.opengl.GL2ES3.GL_IMAGE_CUBE;
-import static com.jogamp.opengl.GL2ES3.GL_INT_IMAGE_2D;
-import static com.jogamp.opengl.GL2ES3.GL_INT_IMAGE_2D_ARRAY;
-import static com.jogamp.opengl.GL2ES3.GL_INT_IMAGE_3D;
-import static com.jogamp.opengl.GL2ES3.GL_INT_IMAGE_BUFFER;
-import static com.jogamp.opengl.GL2ES3.GL_INT_IMAGE_CUBE;
-import static com.jogamp.opengl.GL2ES3.GL_INT_SAMPLER_2D;
-import static com.jogamp.opengl.GL2ES3.GL_INT_SAMPLER_2D_ARRAY;
-import static com.jogamp.opengl.GL2ES3.GL_INT_SAMPLER_3D;
-import static com.jogamp.opengl.GL2ES3.GL_INT_SAMPLER_BUFFER;
-import static com.jogamp.opengl.GL2ES3.GL_INT_SAMPLER_CUBE;
-import static com.jogamp.opengl.GL2ES3.GL_SAMPLER_2D_ARRAY;
-import static com.jogamp.opengl.GL2ES3.GL_SAMPLER_2D_ARRAY_SHADOW;
-import static com.jogamp.opengl.GL2ES3.GL_SAMPLER_BUFFER;
-import static com.jogamp.opengl.GL2ES3.GL_SAMPLER_CUBE_SHADOW;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_ATOMIC_COUNTER;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_IMAGE_2D;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_IMAGE_2D_ARRAY;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_IMAGE_3D;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_IMAGE_BUFFER;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_IMAGE_CUBE;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_SAMPLER_2D;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_SAMPLER_2D_ARRAY;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_SAMPLER_3D;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_SAMPLER_BUFFER;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_SAMPLER_CUBE;
 import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_VEC2;
 import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_VEC3;
 import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_VEC4;
-import static com.jogamp.opengl.GL2GL3.GL_DOUBLE;
-import static com.jogamp.opengl.GL2GL3.GL_INT_SAMPLER_1D;
-import static com.jogamp.opengl.GL2GL3.GL_INT_SAMPLER_1D_ARRAY;
-import static com.jogamp.opengl.GL2GL3.GL_INT_SAMPLER_2D_RECT;
-import static com.jogamp.opengl.GL2GL3.GL_SAMPLER_1D;
-import static com.jogamp.opengl.GL2GL3.GL_SAMPLER_1D_ARRAY;
-import static com.jogamp.opengl.GL2GL3.GL_SAMPLER_1D_ARRAY_SHADOW;
-import static com.jogamp.opengl.GL2GL3.GL_SAMPLER_1D_SHADOW;
-import static com.jogamp.opengl.GL2GL3.GL_SAMPLER_2D_RECT;
-import static com.jogamp.opengl.GL2GL3.GL_SAMPLER_2D_RECT_SHADOW;
-import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_SAMPLER_1D;
-import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_SAMPLER_1D_ARRAY;
-import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_SAMPLER_2D_RECT;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT2;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT2x3;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT2x4;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT3;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT3x2;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT3x4;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT4;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT4x2;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_MAT4x3;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_VEC2;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_VEC3;
-import static com.jogamp.opengl.GL3.GL_DOUBLE_VEC4;
-import static com.jogamp.opengl.GL3.GL_IMAGE_1D;
-import static com.jogamp.opengl.GL3.GL_IMAGE_1D_ARRAY;
-import static com.jogamp.opengl.GL3.GL_IMAGE_2D_MULTISAMPLE;
-import static com.jogamp.opengl.GL3.GL_IMAGE_2D_MULTISAMPLE_ARRAY;
-import static com.jogamp.opengl.GL3.GL_IMAGE_2D_RECT;
-import static com.jogamp.opengl.GL3.GL_INT_IMAGE_1D;
-import static com.jogamp.opengl.GL3.GL_INT_IMAGE_1D_ARRAY;
-import static com.jogamp.opengl.GL3.GL_INT_IMAGE_2D_MULTISAMPLE;
-import static com.jogamp.opengl.GL3.GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY;
-import static com.jogamp.opengl.GL3.GL_INT_IMAGE_2D_RECT;
-import static com.jogamp.opengl.GL3.GL_UNSIGNED_INT_IMAGE_1D;
-import static com.jogamp.opengl.GL3.GL_UNSIGNED_INT_IMAGE_1D_ARRAY;
-import static com.jogamp.opengl.GL3.GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE;
-import static com.jogamp.opengl.GL3.GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY;
-import static com.jogamp.opengl.GL3.GL_UNSIGNED_INT_IMAGE_2D_RECT;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,7 +65,6 @@ public class Shader {
 	private Map<String, Integer> attributeTypes;
 	private Map<String, Integer> uniforms;
 	private Map<String, Integer> uniformTypes;
-	private Map<Integer, Integer> bufferTypes;
 
 	private FloatBuffer matrix2Buffer = Buffers.newDirectFloatBuffer(4);
 	private FloatBuffer matrix3Buffer = Buffers.newDirectFloatBuffer(9);
@@ -217,8 +128,6 @@ public class Shader {
 		int buffer[] = new int[1];
 		gl.glGenVertexArrays(1, buffer, 0);
 		this.vao = buffer[0];
-
-		this.bufferTypes = new HashMap<Integer, Integer>();
 
 		// record attribute and uniforms
 
@@ -288,140 +197,7 @@ public class Shader {
 		gl.glBindVertexArray(this.vao);
 	}
 
-	/**
-	 * Create a new VBO (vertex buffer object) in graphics memory and copy data into
-	 * it
-	 * 
-	 * @param data The data as an array of floats
-	 * @parem type The type of data in this buffer
-	 * @return	The OpenGL handle to the VBO
-	 */
-	
-	public int createBuffer(float[] data, int type) {
-		GL4 gl = (GL4) GLContext.getCurrentGL();
-		int[] buffers = new int[1];
-		gl.glGenBuffers(buffers.length, buffers, 0);
 
-		FloatBuffer buffer = Buffers.newDirectFloatBuffer(data);
-		gl.glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		gl.glBufferData(GL_ARRAY_BUFFER, data.length * Buffers.SIZEOF_FLOAT, buffer, GL_STATIC_DRAW);
-
-		this.bufferTypes.put(buffers[0], type);
-		if (data.length % typeSize(type) != 0) {
-			System.err.println(
-					String.format("Warning: buffer of type %s has length which is not a mutliple of %d.",
-					typeName(type), typeSize(type)));
-		}
-
-		return buffers[0];
-	}
-
-	/**
-	 * Create a new VBO (vertex buffer object) in graphics memory and copy data into
-	 * it from a FloatBuffer
-	 * 
-	 * @param buffer A FloatBuffer containing the data
-	 * @param type The type of data in this buffer
-	 * @return	The OpenGL handle to the VBO
-	 */
-	public int createBuffer(FloatBuffer buffer, int type) {
-		GL4 gl = (GL4) GLContext.getCurrentGL();
-		int[] buffers = new int[1];
-		gl.glGenBuffers(buffers.length, buffers, 0);
-
-		gl.glBindBuffer(GL_ARRAY_BUFFER, buffers[0]);
-		gl.glBufferData(GL_ARRAY_BUFFER, buffer.limit() * Buffers.SIZEOF_FLOAT, buffer, GL_STATIC_DRAW);
-
-		this.bufferTypes.put(buffers[0], type);
-		if (buffer.limit() % typeSize(type) != 0) {
-			System.err.println(
-					String.format("Warning: buffer of type %s has length which is not a mutliple of %d.",
-					typeName(type), typeSize(type)));
-		}
-
-		return buffers[0];
-	}
-
-	/**
-	 * Create a new VBO (vertex buffer object) in graphics memory and copy data into
-	 * it
-	 * 
-	 * @param data The data as an array of Vector2f
-	 * @return	The OpenGL handle to the VBO
-	 */
-	public int createBuffer(Vector2f[] data) {
-		// this is a hack, but I can't get it to work otherwise
-		float[] array = new float[2 * data.length];
-		int j = 0;
-		for (int i = 0; i < data.length; i++) {
-			array[j++] = data[i].x;
-			array[j++] = data[i].y;
-		}
-
-		return createBuffer(array, GL_FLOAT_VEC2);
-	}
-
-	/**
-	 * Create a new VBO (vertex buffer object) in graphics memory and copy data into
-	 * it
-	 * 
-	 * @param data The data as an array of Vector3f
-	 * @return	The OpenGL handle to the VBO
-	 */
-	public int createBuffer(Vector3f[] data) {
-		// this is a hack, but I can't get it to work otherwise
-		float[] array = new float[3 * data.length];
-		int j = 0;
-		for (int i = 0; i < data.length; i++) {
-			array[j++] = data[i].x;
-			array[j++] = data[i].y;
-			array[j++] = data[i].z;
-		}
-
-		return createBuffer(array, GL_FLOAT_VEC3);
-	}
-
-	/**
-	 * Create a new VBO (vertex buffer object) in graphics memory and copy data into
-	 * it. 
-	 * 
-	 * @param data The data as an array of Vector4f
-	 * @return	The OpenGL handle to the VBO
-	 */
-	public int createBuffer(Vector4f[] data) {
-		// this is a hack, but I can't get it to work otherwise
-		float[] array = new float[4 * data.length];
-		int j = 0;
-		for (int i = 0; i < data.length; i++) {
-			array[j++] = data[i].x;
-			array[j++] = data[i].y;
-			array[j++] = data[i].z;
-			array[j++] = data[i].w;
-		}
-
-		return createBuffer(array, GL_FLOAT_VEC4);
-	}
-
-	/**
-	 * Create a new index buffer and initialise it
-	 * 
-	 * @param indices The indices as an array of ints
-	 * @return	The OpenGL handle to the index buffer
-	 */
-	public int createIndexBuffer(int[] indices) {
-		GL4 gl = (GL4) GLContext.getCurrentGL();
-		int[] buffers = new int[1];
-		gl.glGenBuffers(buffers.length, buffers, 0);
-
-		IntBuffer buffer = Buffers.newDirectIntBuffer(indices);
-		gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[0]);
-		gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.length * Buffers.SIZEOF_INT, buffer, GL_STATIC_DRAW);
-
-		this.bufferTypes.put(buffers[0], GL_INT);
-
-		return buffers[0];
-	}
-	
 	/**
 	 * Create a render texture with the specified dimensions
 	 * 
@@ -492,13 +268,10 @@ public class Shader {
 		int attribute = getAttribute(attributeName);
 		int type = attributeTypes.get(attributeName);
 
-		if (bufferTypes.get(buffer) != type) {
-			throw new IllegalArgumentException(String.format("Expected buffer of type %s, got %s.", typeName(type),
-					typeName(bufferTypes.get(buffer))));
-		}
+		GLBuffers.checkType(buffer, type);
 
-		int size = typeSize(type);
-		int elementType = elementType(type);
+		int size = GLTypes.typeSize(type);
+		int elementType = GLTypes.elementType(type);
 
 		gl.glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		gl.glVertexAttribPointer(attribute, size, elementType, false, 0, 0);
@@ -521,7 +294,7 @@ public class Shader {
 			gl.glUniform1ui(uniform, value ? 1 : 0);
 			break;
 		default:
-			throw new IllegalArgumentException(String.format("Expected %s got boolean", typeName(type)));			
+			throw new IllegalArgumentException(String.format("Expected %s got boolean", GLTypes.typeName(type)));			
 		}	
 	}
 
@@ -545,7 +318,7 @@ public class Shader {
 			gl.glUniform1i(uniform, value);
 			break;			
 		default:
-			throw new IllegalArgumentException(String.format("Expected %s got int", typeName(type)));			
+			throw new IllegalArgumentException(String.format("Expected %s got int", GLTypes.typeName(type)));			
 		}	
 	}
 
@@ -561,7 +334,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT) {
-			throw new IllegalArgumentException(String.format("Expected %s got float", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got float", GLTypes.typeName(type)));
 		}
 
 		gl.glUniform1f(uniform, value);
@@ -582,11 +355,11 @@ public class Shader {
 		int uniform = getUniform(uniformName);
 		int type = uniformTypes.get(uniformName);
 
-		int expectedArgs = typeSize(type);
+		int expectedArgs = GLTypes.typeSize(type);
 
 		if (value.length != expectedArgs) {
 			throw new IllegalArgumentException(
-					String.format("Expected %s got int[%d]", typeName(type), value.length));
+					String.format("Expected %s got int[%d]", GLTypes.typeName(type), value.length));
 		}
 
 		switch (type) {
@@ -616,7 +389,7 @@ public class Shader {
 			break;
 		default:
 			throw new IllegalArgumentException(
-					String.format("Cannot convert int array to %s", typeName(type)));
+					String.format("Cannot convert int array to %s", GLTypes.typeName(type)));
 		}
 	}
 
@@ -635,11 +408,11 @@ public class Shader {
 		int uniform = getUniform(uniformName);
 		int type = uniformTypes.get(uniformName);
 
-		int expectedArgs = typeSize(type);
+		int expectedArgs = GLTypes.typeSize(type);
 
 		if (value.length != expectedArgs) {
 			throw new IllegalArgumentException(
-					String.format("Expected %s got float[%d]", typeName(type), value.length));
+					String.format("Expected %s got float[%d]", GLTypes.typeName(type), value.length));
 		}
 
 		switch (type) {
@@ -666,7 +439,7 @@ public class Shader {
 			break;
 		default:
 			throw new IllegalArgumentException(
-					String.format("Cannot convert float array to %s", typeName(type)));
+					String.format("Cannot convert float array to %s", GLTypes.typeName(type)));
 			
 		}
 
@@ -685,7 +458,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT_VEC2) {
-			throw new IllegalArgumentException(String.format("Expected %s got Vector2f", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got Vector2f", GLTypes.typeName(type)));
 		}
 
 		gl.glUniform2fv(uniform, 1, vector.get(vector2Buffer));
@@ -704,7 +477,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT_VEC3) {
-			throw new IllegalArgumentException(String.format("Expected %s got Vector3f", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got Vector3f", GLTypes.typeName(type)));
 		}
 
 		gl.glUniform3fv(uniform, 1, vector.get(vector3Buffer));
@@ -723,7 +496,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT_VEC4) {
-			throw new IllegalArgumentException(String.format("Expected %s got Vector4f", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got Vector4f", GLTypes.typeName(type)));
 		}
 
 		gl.glUniform4fv(uniform, 1, vector.get(vector4Buffer));
@@ -742,7 +515,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT_MAT2) {
-			throw new IllegalArgumentException(String.format("Expected %s got Matrix2f", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got Matrix2f", GLTypes.typeName(type)));
 		}
 
 		gl.glUniformMatrix2fv(uniform, 1, false, matrix.get(matrix2Buffer));
@@ -761,7 +534,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT_MAT3) {
-			throw new IllegalArgumentException(String.format("Expected %s got Matrix3f", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got Matrix3f", GLTypes.typeName(type)));
 		}
 
 		gl.glUniformMatrix3fv(uniform, 1, false, matrix.get(matrix3Buffer));
@@ -780,7 +553,7 @@ public class Shader {
 		int type = uniformTypes.get(uniformName);
 
 		if (type != GL_FLOAT_MAT4) {
-			throw new IllegalArgumentException(String.format("Expected %s got Matrix4f", typeName(type)));
+			throw new IllegalArgumentException(String.format("Expected %s got Matrix4f", GLTypes.typeName(type)));
 		}
 
 		gl.glUniformMatrix4fv(uniform, 1, false, matrix.get(matrix4Buffer));
@@ -790,392 +563,6 @@ public class Shader {
 	// PRIVATE METHODS
 	// ===================
 	
-	
-	private int typeSize(int type) {
-		switch (type) {
-		case GL_FLOAT:
-			return 1;
-		case GL_FLOAT_VEC2:
-			return 2;
-		case GL_FLOAT_VEC3:
-			return 3;
-		case GL_FLOAT_VEC4:
-			return 4;
-		case GL_FLOAT_MAT2:
-			return 4;
-		case GL_FLOAT_MAT3:
-			return 9;
-		case GL_FLOAT_MAT4:
-			return 16;
-		case GL_INT:
-			return 1;
-		case GL_INT_VEC2:
-			return 2;
-		case GL_INT_VEC3:
-			return 3;
-		case GL_INT_VEC4:
-			return 4;
-		case GL_UNSIGNED_INT:
-			return 1;
-		case GL_UNSIGNED_INT_VEC2:
-			return 2;
-		case GL_UNSIGNED_INT_VEC3:
-			return 3;
-		case GL_UNSIGNED_INT_VEC4:
-			return 4;
-		default:
-			throw new UnsupportedOperationException(
-					String.format("Unsupported GLSL attribute type: %s", typeName(type)));
-		}
-
-	}
-
-	private int elementType(int type) {
-		switch (type) {
-		case GL_INT:
-		case GL_INT_VEC2:
-		case GL_INT_VEC3:
-		case GL_INT_VEC4:
-			return GL_INT;
-		case GL_UNSIGNED_INT:
-		case GL_UNSIGNED_INT_VEC2:
-		case GL_UNSIGNED_INT_VEC3:
-		case GL_UNSIGNED_INT_VEC4:
-			return GL_UNSIGNED_INT;
-		case GL_FLOAT:
-		case GL_FLOAT_VEC2:
-		case GL_FLOAT_VEC3:
-		case GL_FLOAT_VEC4:
-		case GL_FLOAT_MAT2:
-		case GL_FLOAT_MAT3:
-		case GL_FLOAT_MAT4:
-			return GL_FLOAT;
-		default:
-			throw new UnsupportedOperationException(
-					String.format("Unsupported GLSL attribute type: %s", typeName(type)));
-		}
-
-	}
-
-	private String typeName(int type) {
-		switch (type) {
-		case GL_FLOAT:
-			return "float";
-
-		case GL_FLOAT_VEC2:
-			return "vec2";
-
-		case GL_FLOAT_VEC3:
-			return "vec3";
-
-		case GL_FLOAT_VEC4:
-			return "vec4";
-
-		case GL_DOUBLE:
-			return "double";
-
-		case GL_DOUBLE_VEC2:
-			return "dvec2";
-
-		case GL_DOUBLE_VEC3:
-			return "dvec3";
-
-		case GL_DOUBLE_VEC4:
-			return "dvec4";
-
-		case GL_INT:
-			return "int";
-
-		case GL_INT_VEC2:
-			return "ivec2";
-
-		case GL_INT_VEC3:
-			return "ivec3";
-
-		case GL_INT_VEC4:
-			return "ivec4";
-
-		case GL_UNSIGNED_INT:
-			return "unsigned int";
-
-		case GL_UNSIGNED_INT_VEC2:
-			return "uvec2";
-
-		case GL_UNSIGNED_INT_VEC3:
-			return "uvec3";
-
-		case GL_UNSIGNED_INT_VEC4:
-			return "uvec4";
-
-		case GL_BOOL:
-			return "bool";
-
-		case GL_BOOL_VEC2:
-			return "bvec2";
-
-		case GL_BOOL_VEC3:
-			return "bvec3";
-
-		case GL_BOOL_VEC4:
-			return "bvec4";
-
-		case GL_FLOAT_MAT2:
-			return "mat2";
-
-		case GL_FLOAT_MAT3:
-			return "mat3";
-
-		case GL_FLOAT_MAT4:
-			return "mat4";
-
-		case GL_FLOAT_MAT2x3:
-			return "mat2x3";
-
-		case GL_FLOAT_MAT2x4:
-			return "mat2x4";
-
-		case GL_FLOAT_MAT3x2:
-			return "mat3x2";
-
-		case GL_FLOAT_MAT3x4:
-			return "mat3x4";
-
-		case GL_FLOAT_MAT4x2:
-			return "mat4x2";
-
-		case GL_FLOAT_MAT4x3:
-			return "mat4x3";
-
-		case GL_DOUBLE_MAT2:
-			return "dmat2";
-
-		case GL_DOUBLE_MAT3:
-			return "dmat3";
-
-		case GL_DOUBLE_MAT4:
-			return "dmat4";
-
-		case GL_DOUBLE_MAT2x3:
-			return "dmat2x3";
-
-		case GL_DOUBLE_MAT2x4:
-			return "dmat2x4";
-
-		case GL_DOUBLE_MAT3x2:
-			return "dmat3x2";
-
-		case GL_DOUBLE_MAT3x4:
-			return "dmat3x4";
-
-		case GL_DOUBLE_MAT4x2:
-			return "dmat4x2";
-
-		case GL_DOUBLE_MAT4x3:
-			return "dmat4x3";
-
-		case GL_SAMPLER_1D:
-			return "sampler1D";
-
-		case GL_SAMPLER_2D:
-			return "sampler2D";
-
-		case GL_SAMPLER_3D:
-			return "sampler3D";
-
-		case GL_SAMPLER_CUBE:
-			return "samplerCube";
-
-		case GL_SAMPLER_1D_SHADOW:
-			return "sampler1DShadow";
-
-		case GL_SAMPLER_2D_SHADOW:
-			return "sampler2DShadow";
-
-		case GL_SAMPLER_1D_ARRAY:
-			return "sampler1DArray";
-
-		case GL_SAMPLER_2D_ARRAY:
-			return "sampler2DArray";
-
-		case GL_SAMPLER_1D_ARRAY_SHADOW:
-			return "sampler1DArrayShadow";
-
-		case GL_SAMPLER_2D_ARRAY_SHADOW:
-			return "sampler2DArrayShadow";
-
-		case GL_SAMPLER_2D_MULTISAMPLE:
-			return "sampler2DMS";
-
-		case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:
-			return "sampler2DMSArray";
-
-		case GL_SAMPLER_CUBE_SHADOW:
-			return "samplerCubeShadow";
-
-		case GL_SAMPLER_BUFFER:
-			return "samplerBuffer";
-
-		case GL_SAMPLER_2D_RECT:
-			return "sampler2DRect";
-
-		case GL_SAMPLER_2D_RECT_SHADOW:
-			return "sampler2DRectShadow";
-
-		case GL_INT_SAMPLER_1D:
-			return "isampler1D";
-
-		case GL_INT_SAMPLER_2D:
-			return "isampler2D";
-
-		case GL_INT_SAMPLER_3D:
-			return "isampler3D";
-
-		case GL_INT_SAMPLER_CUBE:
-			return "isamplerCube";
-
-		case GL_INT_SAMPLER_1D_ARRAY:
-			return "isampler1DArray";
-
-		case GL_INT_SAMPLER_2D_ARRAY:
-			return "isampler2DArray";
-
-		case GL_INT_SAMPLER_2D_MULTISAMPLE:
-			return "isampler2DMS";
-
-		case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
-			return "isampler2DMSArray";
-
-		case GL_INT_SAMPLER_BUFFER:
-			return "isamplerBuffer";
-
-		case GL_INT_SAMPLER_2D_RECT:
-			return "isampler2DRect";
-
-		case GL_UNSIGNED_INT_SAMPLER_1D:
-			return "usampler1D";
-
-		case GL_UNSIGNED_INT_SAMPLER_2D:
-			return "usampler2D";
-
-		case GL_UNSIGNED_INT_SAMPLER_3D:
-			return "usampler3D";
-
-		case GL_UNSIGNED_INT_SAMPLER_CUBE:
-			return "usamplerCube";
-
-		case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:
-			return "usampler2DArray";
-
-		case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:
-			return "usampler2DArray";
-
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:
-			return "usampler2DMS";
-
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:
-			return "usampler2DMSArray";
-
-		case GL_UNSIGNED_INT_SAMPLER_BUFFER:
-			return "usamplerBuffer";
-
-		case GL_UNSIGNED_INT_SAMPLER_2D_RECT:
-			return "usampler2DRect";
-
-		case GL_IMAGE_1D:
-			return "image1D";
-
-		case GL_IMAGE_2D:
-			return "image2D";
-
-		case GL_IMAGE_3D:
-			return "image3D";
-
-		case GL_IMAGE_2D_RECT:
-			return "image2DRect";
-
-		case GL_IMAGE_CUBE:
-			return "imageCube";
-
-		case GL_IMAGE_BUFFER:
-			return "imageBuffer";
-
-		case GL_IMAGE_1D_ARRAY:
-			return "image1DArray";
-
-		case GL_IMAGE_2D_ARRAY:
-			return "image2DArray";
-
-		case GL_IMAGE_2D_MULTISAMPLE:
-			return "image2DMS";
-
-		case GL_IMAGE_2D_MULTISAMPLE_ARRAY:
-			return "image2DMSArray";
-
-		case GL_INT_IMAGE_1D:
-			return "iimage1D";
-
-		case GL_INT_IMAGE_2D:
-			return "iimage2D";
-
-		case GL_INT_IMAGE_3D:
-			return "iimage3D";
-
-		case GL_INT_IMAGE_2D_RECT:
-			return "iimage2DRect";
-
-		case GL_INT_IMAGE_CUBE:
-			return "iimageCube";
-
-		case GL_INT_IMAGE_BUFFER:
-			return "iimageBuffer";
-
-		case GL_INT_IMAGE_1D_ARRAY:
-			return "iimage1DArray";
-
-		case GL_INT_IMAGE_2D_ARRAY:
-			return "iimage2DArray";
-
-		case GL_INT_IMAGE_2D_MULTISAMPLE:
-			return "iimage2DMS";
-
-		case GL_INT_IMAGE_2D_MULTISAMPLE_ARRAY:
-			return "iimage2DMSArray";
-
-		case GL_UNSIGNED_INT_IMAGE_1D:
-			return "uimage1D";
-
-		case GL_UNSIGNED_INT_IMAGE_2D:
-			return "uimage2D";
-
-		case GL_UNSIGNED_INT_IMAGE_3D:
-			return "uimage3D";
-
-		case GL_UNSIGNED_INT_IMAGE_2D_RECT:
-			return "uimage2DRect";
-
-		case GL_UNSIGNED_INT_IMAGE_CUBE:
-			return "uimageCube";
-
-		case GL_UNSIGNED_INT_IMAGE_BUFFER:
-			return "uimageBuffer";
-
-		case GL_UNSIGNED_INT_IMAGE_1D_ARRAY:
-			return "uimage1DArray";
-
-		case GL_UNSIGNED_INT_IMAGE_2D_ARRAY:
-			return "uimage2DArray";
-
-		case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE:
-			return "uimage2DMS";
-
-		case GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY:
-			return "uimage2DMSArray";
-
-		case GL_UNSIGNED_INT_ATOMIC_COUNTER:
-			return "atomic_uint";
-		}
-		throw new IllegalArgumentException("Unknown GL type: " + type);
-	}
 
 	/**
 	 * Establish the mapping from attribute names to IDs
