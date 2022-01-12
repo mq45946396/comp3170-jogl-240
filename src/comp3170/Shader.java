@@ -212,12 +212,38 @@ public class Shader {
 		gl.glGenTextures(1, renderTexture, 0);
 		gl.glBindTexture(GL.GL_TEXTURE_2D, renderTexture[0]);
 		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL.GL_RGBA, width, height, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, null);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
 		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
 		
 		return renderTexture[0];
 	}
-	
+
+	/**
+	 * Create a render texture to act as a depth buffer
+	 * 
+	 * @param width	Texture width in pixels
+	 * @param height	Texture height in pixels
+	 * @return	The OpenGL handle to the render texture.
+	 */
+
+	public static int createDepthTexture(int width, int height) {
+		GL4 gl = (GL4) GLContext.getCurrentGL();
+		int[] renderTexture = new int[1];
+		gl.glGenTextures(1, renderTexture, 0);
+		gl.glBindTexture(GL.GL_TEXTURE_2D, renderTexture[0]);
+		gl.glTexImage2D(GL.GL_TEXTURE_2D, 0, GL4.GL_DEPTH_COMPONENT, width, height, 0, GL4.GL_DEPTH_COMPONENT, GL.GL_UNSIGNED_BYTE, null);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_NEAREST);
+		gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_NEAREST);
+		
+		return renderTexture[0];
+	}
+
 	/**
 	 * Create a framebuffer that writes colours to the renderTexture given.
 	 * 
@@ -256,6 +282,51 @@ public class Shader {
 
 		return framebufferName[0];
 	}
+	
+	public static int createFrameBuffer(Integer colourTexture, Integer depthTexture) throws GLException {
+		GL4 gl = (GL4) GLContext.getCurrentGL();
+
+		int[] width = new int[1];
+		int[] height = new int[1];
+		gl.glGetTexLevelParameteriv(GL.GL_TEXTURE_2D, 0, GL4.GL_TEXTURE_WIDTH, width, 0);
+		gl.glGetTexLevelParameteriv(GL.GL_TEXTURE_2D, 0, GL4.GL_TEXTURE_HEIGHT, height, 0);
+		
+		int[] framebufferName = new int[1];
+		gl.glGenFramebuffers(1, framebufferName, 0);
+		gl.glBindFramebuffer(GL.GL_FRAMEBUFFER, framebufferName[0]);		
+
+		int[] drawBuffers = new int[] { GL4.GL_COLOR_ATTACHMENT0 };
+		gl.glDrawBuffers(drawBuffers.length, drawBuffers, 0);
+
+		if (colourTexture == null ) {
+			// no colour buffer
+			gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, GL.GL_RENDERBUFFER, 0);						
+		}
+		else {
+			gl.glFramebufferTexture(GL.GL_FRAMEBUFFER, GL.GL_COLOR_ATTACHMENT0, colourTexture, 0);
+		}
+
+		if (depthTexture == null) {
+			// default depth buffer
+			int[] depthrenderbuffer = new int[1];
+			gl.glGenRenderbuffers(1, depthrenderbuffer, 0);
+			gl.glBindRenderbuffer(GL.GL_RENDERBUFFER, depthrenderbuffer[0]);
+			gl.glRenderbufferStorage(GL.GL_RENDERBUFFER, GL4.GL_DEPTH_COMPONENT, width[0], height[0]);
+			gl.glFramebufferRenderbuffer(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, GL.GL_RENDERBUFFER, depthrenderbuffer[0]);
+		}
+		else {
+			gl.glFramebufferTexture(GL.GL_FRAMEBUFFER, GL.GL_DEPTH_ATTACHMENT, depthTexture, 0);
+		}
+
+		
+		if (gl.glCheckFramebufferStatus(GL.GL_FRAMEBUFFER) != GL.GL_FRAMEBUFFER_COMPLETE) {
+			GLException.checkGLErrors();
+			throw new GLException("Failed to create framebuffer");
+		}
+
+		return framebufferName[0];
+	}
+
 	
 	/**
 	 * Connect a buffer to a shader attribute
