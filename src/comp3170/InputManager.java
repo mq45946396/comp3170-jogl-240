@@ -82,11 +82,11 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 	}
 
 	/**
-	 * Write the current mouse position in viewport coordinates into dest as a 3D
+	 * Write the current mouse position in NDC into dest as a 3D
 	 * homogenous point of the form (x, y, 0, 1)
 	 * 
 	 * @param dest The destination vector to write the value
-	 * @return the mouse position vector
+	 * @return the mouse position vector in NDC
 	 */
 	public Vector4f getMousePosition(Vector4f dest) {
 		return this.mousePosition.get(dest);
@@ -183,6 +183,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
+		// convert to NDC
 		mousePosition.x = 2.0f * e.getX() / canvas.getWidth() - 1;
 		mousePosition.y = 2.0f * e.getY() / canvas.getHeight() - 1;
 		mousePosition.y = -mousePosition.y;
@@ -190,6 +191,7 @@ public class InputManager implements KeyListener, MouseListener, MouseMotionList
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
+		// convert to NDC
 		mousePosition.x = 2.0f * e.getX() / canvas.getWidth() - 1;
 		mousePosition.y = 2.0f * e.getY() / canvas.getHeight() - 1;
 		mousePosition.y = -mousePosition.y;
