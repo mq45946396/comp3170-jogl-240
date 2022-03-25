@@ -11,30 +11,7 @@ package comp3170;
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_FLOAT;
 import static com.jogamp.opengl.GL.GL_UNSIGNED_INT;
-import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_ATTRIBUTES;
-import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_ATTRIBUTE_MAX_LENGTH;
-import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_UNIFORMS;
-import static com.jogamp.opengl.GL2ES2.GL_ACTIVE_UNIFORM_MAX_LENGTH;
-import static com.jogamp.opengl.GL2ES2.GL_BOOL;
-import static com.jogamp.opengl.GL2ES2.GL_COMPILE_STATUS;
-import static com.jogamp.opengl.GL2ES2.GL_FLOAT_MAT2;
-import static com.jogamp.opengl.GL2ES2.GL_FLOAT_MAT3;
-import static com.jogamp.opengl.GL2ES2.GL_FLOAT_MAT4;
-import static com.jogamp.opengl.GL2ES2.GL_FLOAT_VEC2;
-import static com.jogamp.opengl.GL2ES2.GL_FLOAT_VEC3;
-import static com.jogamp.opengl.GL2ES2.GL_FLOAT_VEC4;
-import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
-import static com.jogamp.opengl.GL2ES2.GL_INFO_LOG_LENGTH;
-import static com.jogamp.opengl.GL2ES2.GL_INT;
-import static com.jogamp.opengl.GL2ES2.GL_INT_VEC2;
-import static com.jogamp.opengl.GL2ES2.GL_INT_VEC3;
-import static com.jogamp.opengl.GL2ES2.GL_INT_VEC4;
-import static com.jogamp.opengl.GL2ES2.GL_LINK_STATUS;
-import static com.jogamp.opengl.GL2ES2.GL_SAMPLER_2D;
-import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_VEC2;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_VEC3;
-import static com.jogamp.opengl.GL2ES3.GL_UNSIGNED_INT_VEC4;
+import static com.jogamp.opengl.GL4.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -769,7 +746,7 @@ public class Shader {
 				logString = new String(log);
 			}
 
-			String message = String.format("%s: compilation error\n%s", sourceFile.getName(), logString);
+			String message = String.format("%s: %s compilation error\n%s", sourceFile.getName(), shaderType(type), logString);
 			throw new GLException(message);
 		}
 
@@ -788,6 +765,15 @@ public class Shader {
 			return "Vertex shader";
 		case GL_FRAGMENT_SHADER:
 			return "Fragment shader";
+		// adding these for completeness, not because they're used
+		case GL_GEOMETRY_SHADER:
+			return "Geometry shader";
+		case GL_COMPUTE_SHADER:
+			return "Compute shader";
+		case GL_TESS_CONTROL_SHADER:
+			return "Tessellation control shader";
+		case GL_TESS_EVALUATION_SHADER:
+			return "Tessellation evaluation shader";
 		}
 		return "Unknown shader";
 	}
