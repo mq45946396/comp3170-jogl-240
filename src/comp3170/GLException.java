@@ -5,6 +5,7 @@ import com.jogamp.opengl.GL4;
 import com.jogamp.opengl.GLContext;
 import com.jogamp.opengl.glu.GLU;
 
+@SuppressWarnings("serial")
 public class GLException extends Exception {
 
 	private int glError;
@@ -20,6 +21,10 @@ public class GLException extends Exception {
 	public GLException(String message) {
 		super(message);
 		this.glError = 0;
+	}
+	
+	public int getErrorCode() {
+		return this.glError;
 	}
 
 	public static void checkGLErrors() throws GLException  {
