@@ -75,6 +75,13 @@ public class Shader {
 		gl.glAttachShader(this.program, fragmentShader);
 		gl.glLinkProgram(program);
 		GLException.checkGLErrors();
+		
+		// delete the shaders after linking
+		
+		gl.glDetachShader(this.program, vertexShader);
+		gl.glDetachShader(this.program, fragmentShader);
+		gl.glDeleteShader(vertexShader);
+		gl.glDeleteShader(fragmentShader);
 
 		// check for linker errors
 
@@ -746,6 +753,9 @@ public class Shader {
 				logString = new String(log);
 			}
 
+			// delete the shader if the compilation failed
+			gl.glDeleteShader(shader);
+			
 			String message = String.format("%s: %s compilation error\n%s", sourceFile.getName(), shaderType(type), logString);
 			throw new GLException(message);
 		}
