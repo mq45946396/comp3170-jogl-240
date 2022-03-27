@@ -370,6 +370,10 @@ public class Shader {
 			break;
 		case GL_INT:
 		case GL_SAMPLER_2D:
+		case GL_SAMPLER_2D_SHADOW:
+		case GL_SAMPLER_3D:   // following is not covered in unit, but
+		case GL_SAMPLER_CUBE: // is supported for advanced textures
+		case GL_SAMPLER_CUBE_SHADOW:
 			gl.glUniform1i(uniform, value);
 			break;			
 		default:
