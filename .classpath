@@ -6,12 +6,12 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="gluegen-rt-2.4.0-rc-20200202.jar"/>
+	<classpathentry kind="lib" path="gluegen-rt-2.4.0-rc-20200202.jar" sourcepath="gluegen-rt-2.4.0-rc-20200202-sources.jar"/>
 	<classpathentry kind="lib" path="gluegen-rt-2.4.0-rc-20200202-natives-macosx-universal.jar"/>
 	<classpathentry kind="lib" path="gluegen-rt-2.4.0-rc-20200202-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="jogl-all-2.4.0-rc-20200202.jar"/>
+	<classpathentry kind="lib" path="jogl-all-2.4.0-rc-20200202.jar" sourcepath="jogl-all-2.4.0-rc-20200202-sources.jar"/>
 	<classpathentry kind="lib" path="jogl-all-2.4.0-rc-20200202-natives-macosx-universal.jar"/>
 	<classpathentry kind="lib" path="jogl-all-2.4.0-rc-20200202-natives-windows-amd64.jar"/>
-	<classpathentry kind="lib" path="joml-1.10.4.jar"/>
+	<classpathentry kind="lib" path="joml-1.10.4.jar" sourcepath="joml-1.10.4-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
