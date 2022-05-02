@@ -45,6 +45,9 @@ public class Shader {
 	private Map<String, Integer> uniforms;
 	private Map<String, Integer> uniformTypes;
 
+	private Map<String, Boolean> trackedAttributeErrors;
+	private Map<String, Boolean> trackedUniformErrors;
+	
 	private FloatBuffer matrix2Buffer = Buffers.newDirectFloatBuffer(4);
 	private FloatBuffer matrix3Buffer = Buffers.newDirectFloatBuffer(9);
 	private FloatBuffer matrix4Buffer = Buffers.newDirectFloatBuffer(16);
@@ -155,10 +158,11 @@ public class Shader {
 			String message = String.format("Unknown attribute: '%s'", name);
 			if(!SHADER_DEBUG_MODE) {
 				throw new IllegalArgumentException(String.format("%s\nTo prevent crashes, call 'Shader.setDebugMode(true);' in your program.", message));
-			} else {
+			} else if(!this.trackedAttributeErrors.containsKey(name)) {
 				System.err.println(message);
-				return -1;
+				this.trackedAttributeErrors.put(name, true);
 			}
+			return -1;
 		}
 
 		return this.attributes.get(name);
@@ -176,10 +180,11 @@ public class Shader {
 			String message = String.format("Unknown uniform: '%s'", name);
 			if(!SHADER_DEBUG_MODE) {
 				throw new IllegalArgumentException(String.format("%s\nTo prevent crashes, call 'Shader.setDebugMode(true);' in your program.", message));
-			} else {
+			} else if(!this.trackedUniformErrors.containsKey(name)) {
 				System.err.println(message);
-				return -1;
+				this.trackedUniformErrors.put(name, true);
 			}
+			return -1;
 		}
 
 		return this.uniforms.get(name);
@@ -663,6 +668,7 @@ public class Shader {
 
 		this.attributes = new HashMap<String, Integer>();
 		this.attributeTypes = new HashMap<String, Integer>();
+		this.trackedAttributeErrors = new HashMap<String, Boolean>();
 
 		int[] iBuff = new int[1];
 		gl.glGetProgramiv(this.program, GL_ACTIVE_ATTRIBUTES, iBuff, 0);
@@ -695,6 +701,7 @@ public class Shader {
 
 		this.uniforms = new HashMap<String, Integer>();
 		this.uniformTypes = new HashMap<String, Integer>();
+		this.trackedUniformErrors = new HashMap<String, Boolean>();
 
 		int[] iBuff = new int[1];
 		gl.glGetProgramiv(this.program, GL_ACTIVE_UNIFORMS, iBuff, 0);
